@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Dish;
+use App\Form\DishType;
 use App\Repository\DishRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -25,14 +26,46 @@ class DishController extends AbstractController
     }
 
     #[Route('/create', name: 'create')]
-    function create(Request $request , EntityManagerInterface $registry)
+    public function create(Request $request , EntityManagerInterface $registry)
     {
         $dish = new Dish();
-        $dish->setName('sandwich');
-        $dishName =$dish ->getName();
-        $registry->persist($dish);
-        $registry->flush();
+        //Form
+        $form = $this->createForm(DishType::class , $dish);
+        $form->handleRequest($request);
+        if($form->isSubmitted()){
+            $picture = $request->files->get('dish')['Attachment'];
+            if($picture){
+                $filename = md5(uniqid()).'.'.$picture->guessClientExtension();
+            }
+            $picture->move(
+                $this->getParameter('picture_folder'),
+                $filename
+            );
+            $dish -> setPicture($filename);
+            $registry -> persist($dish);
+            $registry -> flush();
+            return $this->redirect($this->generateUrl('dish.edit'));
+        }
+        
+        
 
-        return new Response($dishName.'has been created', Response::HTTP_CREATED);
+        return $this->render('dish/create.html.twig', [
+            'createForm' => $form->createView(),
+        ]);
+    }
+    #[Route('/delete/{id}', name: 'delete')]
+    function delete($id , DishRepository $dishRep ,EntityManagerInterface $registry){
+        $dish =$dishRep ->find($id);
+        $registry -> remove($dish); 
+        $registry -> flush();
+        //message
+        $this ->addFlash('success','Dish has been deleted successfully') ; 
+        return $this->redirect($this->generateUrl('dish.edit'));
+    }
+    #[Route('/show/{id}', name: 'show')]
+    public function show(dish $dish){
+        return $this->render('dish/show.html.twig',[
+            'dish'=> $dish
+        ]) ;
     }
 }

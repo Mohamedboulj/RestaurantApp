@@ -42,11 +42,13 @@
 			<img src="{{ asset('img/logo.png') }}" alt="">
 		</a>
 		<div class="header-right">
-			<a href="#" class="hr-btn">Help</a>
-			<span>|</span>
 			<div class="user-panel">
-				<a href="" class="login">Login</a>
-				<a href="" class="register">Create an account</a>
+			{% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+				<a href="{{ path('app_login') }}" class="login">Login</a>
+			{% endif %}
+			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+				<a href="{{ path('app_logout') }}" >Logout</a>
+			{% endif %}
 			</div> 
 		</div>
 		<ul class="main-menu">
@@ -54,15 +56,17 @@
 			<li><a href="#">About</a></li>
 			<li><a href="blog.html">News</a></li>
 			<li><a href="contact.html">Contact</a></li>
+			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 			<li><a href="#">Employees</a>
 				<ul class="sub-menu">
 					<li><a href="{{ path('dish.edit') }}">Dishes</a></li>
-					<li><a href="playlist.html">Playlist</a></li>
+					<li><a href="{{ path('dish.create') }}">Add new dish</a></li>
 					<li><a href="artist.html">Artist</a></li>
 					<li><a href="blog.html">Blog</a></li>
-					<li><a href="contact.html">Contact</a></li>
+					<li><a href="{{ path('register') }}" class="register">Create an account</a></li>
 				</ul>
 			</li>	
+			{% endif %}
 		</ul>
 	</header>
 	<!-- Header section end -->

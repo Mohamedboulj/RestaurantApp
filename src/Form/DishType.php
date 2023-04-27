@@ -2,7 +2,10 @@
 
 namespace App\Form;
 
+use App\Entity\Category;
 use App\Entity\Dish;
+
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,10 +17,11 @@ class DishType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name')
+            ->add('Name')
             ->add('Attachment',FileType::class,['mapped'=>false])
-            ->add('description')
-            ->add('price')
+            ->add('Description')
+            ->add('Category', EntityType::class, ['class'=>Category::class])
+            ->add('Price')
             ->add('Save', SubmitType::class);
         ;
     }

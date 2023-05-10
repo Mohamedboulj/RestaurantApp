@@ -226,10 +226,11 @@ Header section
 	background: #08192d;
 }
 
-.site-logo {
+.site-logo h3{
 	display: inline-block;
 	padding: 0;
 	padding: 44px 15px;
+	color: #FC0254;
 }
 
 .header-right {

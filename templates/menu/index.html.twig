@@ -4,7 +4,11 @@
 
 {% block body %}
 
-
+{% for messsage in app.flashes('order') %} 
+<div class="alert alert-success">
+<h3>{{ messsage}}</h3>
+</div>
+{% endfor %}
 
 <section class="playlist-section spad">
 		<div class="container-fluid">
@@ -26,8 +30,11 @@
 				<div class="mix col-lg-3 col-md-4 col-sm-6 {{ dish.category }}">
 					<div class="playlist-item">
 						<img src="{{ asset('pictures/'~ dish.picture) }}" alt="">
-						<h5>{{dish.description}} - {{dish.price}}$ </h5>
-                        <p>Order Nbr.{{dish.id}}</p>
+						<h5>{{dish.name}} - {{dish.price}}$ </h5>
+                        <p>
+							Order Nbr.{{dish.id}}
+							<a class="btn btn-outline-danger btn-sm" href="{{ path('order',{id:dish.id}) }}" role="button">Order</a>
+						</p>
 					</div>
 				</div>
             {% endfor %}

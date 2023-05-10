@@ -18,11 +18,11 @@ class DishType extends AbstractType
     {
         $builder
             ->add('Name')
-            ->add('Attachment',FileType::class,['mapped'=>false])
+            ->add('Attachment',FileType::class,['mapped'=>false,'attr'=>array('id'=>'form-file')])
             ->add('Description')
-            ->add('Category', EntityType::class, ['class'=>Category::class])
+            ->add('Category', EntityType::class, ['class'=>Category::class, 'attr'=>array('class'=>'custom-select custom-select-md')])
             ->add('Price')
-            ->add('Save', SubmitType::class);
+            ->add('Create', SubmitType::class,['attr'=>array('class'=>'btn btn-outline-danger float-right')]);
         ;
     }
 

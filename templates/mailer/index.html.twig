@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			<h3>
+				{{ message }}
+			</h3>
+		</div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+		<div class="alert alert-danger">
+			<h3>
+				{{ message }}
+			</h3>
+		</div>
+{% endfor %}
+
+	<section class="contact-section">
+		<div class="container-fluid">
+			<div class="row">
+				<div
+					class="col-lg-6 p-0">
+					<!-- Map -->
+					<div class="mapouter">
+                        <div class="gmap_canvas">
+                            <iframe width="100%" height="100%" id="gmap_canvas" src="https://maps.google.com/maps?q=Parkers' Lighthouse&t=&z=10&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a href="https://2yu.co">2yu</a><br><style>.mapouter{position:relative;text-align:right;height:100%;width:100%;}</style><a href="https://embedgooglemap.2yu.co/">html embed google map</a><style>.gmap_canvas {overflow:hidden;background:none!important;height:100%;width:100%;}</style>
+                        </div>
+                    </div>
+				</div>
+				<div class="col-lg-6 p-0">
+					<div class="contact-warp">
+						<div class="section-title mb-0">
+							<h2>Contact us</h2>
+						</div>
+						<p>Would you like to communicate any additional requests to your waiter regarding your order? On this page, you have the opportunity to get in touch with our qualified service personnel through our contact form. Whether something is missing or you have extra requests for our dishes, we are here to help. We also welcome praise, suggestions, and criticism. Do not hesitate to contact us.</p>
+						{{form(emailForm)}}
+						</div>
+					</div>
+				</div>
+			</div>
+    </section>
+
+{% endblock %}

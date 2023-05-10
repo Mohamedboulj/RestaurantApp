@@ -30,7 +30,7 @@
                 <td>{{ dish.description }}</td>
                 <td>{{ dish.category }}</td>
                 <td>{{ dish.price }}</td>
-                <td><a href="{{ path('dish.delete' , {id:dish.id}) }}">X</a></td>
+                <td><a class="btn btn-sm btn-outline-danger" href="{{ path('dish.delete' , {id:dish.id}) }}" role="button">X</a></td>
             </tr>
             {% endfor %}
         </tbody>

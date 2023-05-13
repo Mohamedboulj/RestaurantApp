@@ -4,8 +4,51 @@
 
 {% block body %}
 <div class="container">
-    <h3>Register</h3>
-    {{ form(regform) }}
+    {% for message in app.flashes('success') %}
+        <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+            <h4>{{message}}</h4>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+    <h3 class="my-2">Create waiters</h3>
+    <div class="row justify-content-center align-items-center g-2">
+        <div class="col-md">
+            <div class="table-responsive">
+                <table class="table table-primary">
+                    <thead>
+                        <tr class="">
+                            <td >id</td>
+                            <td>Name</td>
+                            <td>Role</td>
+                            <td>Action</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="">
+                            
+                            <td>{{user.id}}</td>
+                            <td>{{user.username}}</td>
+                            <td>{{user.roles[0]}}</td>
+                            <td>
+                                <a class="text-danger" href="{{ path('delete_user', {id: user.id}) }}">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </a>
+                            </td>
+                            
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> 
+        </div>
+        <div class="col-md">
+            {{ form(regform) }}
+        </div>
+    </div>
+    
 
     
 </div>

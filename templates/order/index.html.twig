@@ -6,6 +6,7 @@
 {% set sum = 0 %}
 <div class="container">
 <h3 class="my-2"> Your Orders </h3>
+<div class= "d-flex justify-content-end mb-2"><a class="btn btn-outline-primary" href="#">Make order <i class="fa fa-plus-circle" aria-hidden="true"></i></a></div>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -14,7 +15,7 @@
             <td>Status</td>
             <td></td>
             <td>Price</td>
-            
+            <td>Action</td>
         </tr>
     </thead>
     <tbody>
@@ -63,6 +64,7 @@
             <td></td>
             <td></td>
             <td class="text-bold text-dark">Total: {{sum}} $</td>
+            <td></td>
         </tr>
     </tbody>
 </table>

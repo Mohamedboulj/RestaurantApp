@@ -44,7 +44,7 @@ class OrderController extends AbstractController
         ]);
     }
     #[Route('/status/{id},{status}',name:'status')]
-    public function status($id , $status,OrderRepository $ord, EntityManagerInterface $registry)
+    public function status($id , $status, EntityManagerInterface $registry)
     {
         $order = $registry->getRepository(Order::class)->find($id);
         $order->setStatus($status);

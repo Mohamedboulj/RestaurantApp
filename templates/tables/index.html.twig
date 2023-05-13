@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+
+{% set sum = 0 %}
+<div class="container">
+{% for message in app.flashes('success') %}
+    <div class="my-2 alert alert-success alert-dismissible fade show" role="alert">
+        <h4>{{message}}</h4>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endfor %}
+<h3 class="my-2"> Tables management </h3>
+<div class="row">
+<div class="col-md-12">
+<div class= "d-flex justify-content-end mb-2"><a class="btn btn-outline-primary" href="{{ path('tables.create') }}">Create new table <i class="fa fa-plus-circle" aria-hidden="true"></i>
+</a></div>
+</div>
+</div>
+<table  class="table table-striped">
+    <thead>
+        <tr>
+            <td>id</td>
+            <td>Table N°</td>
+            <td>Status</td>
+            <td>Actions</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for table in tables %}
+        <tr>
+            {% if table is empty%}
+            <td colspan="4"> No table found !</td>
+            {% else %}
+            <td>{{table.id}}</td>
+            <td>{{table.number}}</td>
+            <td>
+            {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            <div class="dropdown">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ table.status }}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li>
+                            <a class="dropdown-item" href="{{ path('tables.update',{id:table.id , status:'Availabe'}) }}" >Availabe</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ path('tables.update',{id:table.id , status:'Not Available'}) }}" >Not Availabe</a>
+                        </li>
+                    </ul>
+            </div>
+            {% endif %}
+            </td>
+            <td>
+                <a class="btn btn-outline-danger btn-sm" href="{{ path('tables.delete',{id:table.id}) }}" role="button" >remove</a>
+            </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

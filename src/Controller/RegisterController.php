@@ -6,7 +6,9 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -28,6 +30,7 @@ class RegisterController extends AbstractController
             'first_options'=>['label'=>'Password'],
             'second_options'=>['label'=>'Repeat password']
         ])
+        ->add('Role',ChoiceType::class,['choices'=>['ROLE_WAITER'=>'ROLE_WAITER','ROLE_ADMIN'=>'ROLE_ADMIN'],'attr'=>['class' => 'form-control'],'required'=>true])
         ->add('Save',SubmitType::class,['attr'=>array('class'=>'btn btn-outline-primary float-right')])
         ->getForm()
         ;
@@ -40,7 +43,8 @@ class RegisterController extends AbstractController
                 $passwordhasher
                 ->hashPassword($user,$input['password'])
                 );
-
+            $role_arr = explode(',',$input['Role']);
+            $user->setRoles($role_arr);
             $registry->persist($user);
             $registry->flush();
             return $this->redirect($this->generateUrl('register'));

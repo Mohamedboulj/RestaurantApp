@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Asset\Package;
 use Symfony\Component\Asset\VersionStrategy\EmptyVersionStrategy;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/sales', name: 'sales.')]
 class SalesController extends AbstractController
@@ -31,7 +32,7 @@ class SalesController extends AbstractController
         foreach ($tables as $table) {
             $html .= '<div class="col-md-3 mb-4">';
             $html .= 
-            '<button class="btn btn-light btn-table " data-id="'.$table->getNumber().'" data-name="'.$table->getNumber().'">
+            '<button class="btn btn-light btn-table " data-id="'.$table->getId().'" data-name="Table N°'.$table->getNumber().'">
             
             <img class="img-fluid" src="'.$pic.'"/>
             <br>';
@@ -56,7 +57,7 @@ class SalesController extends AbstractController
             $pic = $package->getUrl('/pictures/'.$menu->getPicture()) ;
             $html .= 
             '<div class="col-md-3 text-center">
-                <a class="btn btn-outline-light btn-menu" data-id="'.$menu->getId().'">
+                <a class="btn btn-outline-light btn-menu curs-ptr" data-name="'.$menu->getName().'" data-id="'.$menu->getId().'">
                     <img class="img-fluid" src="'.$pic.'">
                     <br>
                     '.$menu->getName().'
@@ -68,6 +69,11 @@ class SalesController extends AbstractController
         
         return new Response($html) ;
 
+    }
+    #[Route('/orderFood', name: 'orderFood')]
+    public function orderFood(Request $req): Response
+    {
+        return new Response($req->get('menu_id')) ;
     }
     
 }

@@ -17,21 +17,28 @@
                             <div class="col-md">
                                 <button id="show-table" type="button" class="btn btn-outline-primary">View tables <i class="fa fa-eye" aria-hidden="true"></i></button>
                                 <div class="row my-3" id="table-details"></div>
+                                <div id="selected-table" class="row" ></div>
                             </div>
                             <div class="col-md">
                                 <nav>
                                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                                         {% for category in categories %}
-                                            <a class="nav-item nav-link curs-ptr " data-id="{{category.id}}" data-toggle="tab" >
-                                            {{category.name}}
-                                            </a>
+                                            <li class="nav-item">
+                                                <a class="nav-item nav-link curs-ptr " data-id="{{category.id}}" data-toggle="tab" >
+                                                {{category.name}}
+                                                </a>
+                                            </li>
                                         {% endfor %}
+                                        </ul>
                                     </div>
                                 </nav>
                                 <div id="list-menu" class="row mt-2"></div>
+                                <div id="selected-dish" class="row mt-2"></div>
                             </div>
                         </div>
-                        
+                    </div>
+                    <div id="order-detail" class="card-footer">
                     </div>
                 </div>
         </div>
@@ -59,10 +66,44 @@
             var id = $(this).data('id');
             {# alert(id); #}
             $.get('/sales/getMenu/'+id,function(data){
+                $('#list-menu').hide();
                 $('#list-menu').html(data);
+                $('#list-menu').fadeIn('fast');
         })
-        
     })
+        
+        var SELECTED_TABLE_ID = "";
+        var SELECTED_TABLE_NAME = "";
+        var SALE_ID = "";
+        // detect button table onclick to show table data
+        $("#table-details").on("click", ".btn-table", function(){
+            SELECTED_TABLE_ID = $(this).data("id");
+            SELECTED_TABLE_NAME = $(this).data("name");
+            $("#selected-table").html('<br><h4>Table: '+SELECTED_TABLE_NAME+'</h4><hr>');
+            
+        });
+        // make the order details 
+        $("#list-menu").on("click", ".btn-menu", function(){
+        if(SELECTED_TABLE_ID == ""){
+        alert("Please select a table for the customer first");
+        }else{
+        var menu_id = $(this).data("id");
+        $.ajax({
+            type: "POST",
+            data: {
+            "_token" : $('meta[name="csrf-token"]').attr('content'),
+            "menu_id": menu_id,
+            "table_id": SELECTED_TABLE_ID,
+            "table_name": SELECTED_TABLE_NAME,
+            "quantity" : 1
+            },
+            url: "/sales/orderFood",
+            success: function(data){
+            $("#order-detail").html(data);
+            }
+        });
+        }
+    });
 })
 </script>
 {% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello SalesController!{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h3 class="my-2">Sales</h3>
+    <div class="row justify-content-center align-items-center my-2 g-2">
+        <div class="col-md">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Cashier</h4>
+                    </div>
+                    <div class="card-body">
+                        
+                        <div class="row">
+                            <div class="col-md">
+                                <button id="show-table" type="button" class="btn btn-outline-primary">View tables <i class="fa fa-eye" aria-hidden="true"></i></button>
+                                <div class="row my-3" id="table-details"></div>
+                            </div>
+                            <div class="col-md">
+                                <nav>
+                                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                        {% for category in categories %}
+                                            <a class="nav-item nav-link curs-ptr " data-id="{{category.id}}" data-toggle="tab" >
+                                            {{category.name}}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </nav>
+                                <div id="list-menu" class="row mt-2"></div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+        </div>
+    </div>    
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#table-details').hide();
+        
+            $('#show-table').click(function(){
+            if( $('#table-details').is(":hidden") ){    
+                $.get('/sales/getTables',function(data){
+                    $('#table-details').html(data);
+                    $('#table-details').slideDown('fast');
+                    $('#show-table').html('Hide Tables <i class="fa fa-eye-slash" aria-hidden="true"></i>').removeClass('btn-outline-primary').addClass('btn-outline-danger');
+            })
+            }else{
+            $('#table-details').slideUp('fast');
+            $('#show-table').html('View Tables <i class="fa fa-eye" aria-hidden="true"></i>').removeClass('btn-outline-danger').addClass('btn-outline-primary');
+        }
+        })
+        
+        $('.nav-link').click(function(){
+            var id = $(this).data('id');
+            {# alert(id); #}
+            $.get('/sales/getMenu/'+id,function(data){
+                $('#list-menu').html(data);
+        })
+        
+    })
+})
+</script>
+{% endblock %}

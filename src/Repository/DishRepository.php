@@ -39,6 +39,16 @@ class DishRepository extends ServiceEntityRepository
         }
     }
 
+    public function findByCategory($category_id)
+    {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.category', 'c')
+            ->andWhere('c.id = :categoryId')
+            ->setParameter('categoryId', $category_id)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Dish[] Returns an array of Dish objects
 //     */

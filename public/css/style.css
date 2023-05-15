@@ -20,6 +20,10 @@ body {
 	font-smoothing: antialiased;
 }
 
+.curs-ptr{
+	cursor: pointer;
+}
+
 h1,
 h2,
 h3,

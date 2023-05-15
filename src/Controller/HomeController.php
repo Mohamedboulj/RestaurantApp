@@ -14,7 +14,6 @@ class HomeController extends AbstractController
     {
         $dish = $dish->findAll();
         $rand_dish = array_rand($dish,2) ;
-        dump($dish[$rand_dish[0]]);
         
         return $this->render('home/index.html.twig', [
             'dish1' => $dish[$rand_dish[0]],

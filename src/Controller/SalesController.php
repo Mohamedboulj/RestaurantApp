@@ -176,7 +176,7 @@ class SalesController extends AbstractController
                     <td>'.($saleDetail->getMenuPrice() * $saleDetail->getQuantity()).'</td>';
                     if($saleDetail->getStatus() == "Not Confirmed"){
                         $showBtnPayment = false;
-                        $html .= '<td><a data-id="'.$saleDetail->getMenuId().'" class="btn btn-danger btn-delete-saledetail"><i class="fa fa-trash-o" aria-hidden="true"></i>'.$saleDetail->getStatus().'</a></td>';
+                        $html .= '<td><a data-id="'.$saleDetail->getId().'" class="btn btn-danger btn-delete-saledetail"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>';
                     }else{ // status == "confirm"
                         $html .= '<td><i class="fa fa-check-circle-o" aria-hidden="true"></i></td>';
                     }
@@ -210,5 +210,25 @@ class SalesController extends AbstractController
         $html = $this->getSaleDetails($sale_id , $em)->getContent() ;
         return new Response( $html ) ;
 
+    }
+    #[Route('/DeleteOrder',name:'Deleteorder')]
+    public function deleteSaleDetail(Request $request , EntityManagerInterface $em){
+        $saleDetail_id = $request->get('saleDetail_id');
+        $saleDetail = $em->getRepository(SaleDetails::class)->find($saleDetail_id);
+        $sale_id = $saleDetail->getSaleId();
+        $menu_price = ($saleDetail->menu_price * $saleDetail->quantity);
+        $saleDetail->delete();
+        //update total price
+        $sale = Sale::find($sale_id);
+        $sale->total_price = $sale->total_price - $menu_price;
+        $sale->save();
+        // check if there any saledetail having the sale id 
+        $saleDetails = SaleDetail::where('sale_id', $sale_id)->first();
+        if($saleDetail){
+            $html = $this->getSaleDetails($sale_id);
+        }else{
+            $html = "Not Found Any Sale Details for the Selected Table";
+        }
+        return $html;
     }
 }

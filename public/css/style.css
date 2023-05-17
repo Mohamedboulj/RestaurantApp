@@ -24,6 +24,9 @@ body {
 	cursor: pointer;
 }
 
+.nav-pills .nav-link.active{
+	background-color: #FC0254 !important;
+}
 h1,
 h2,
 h3,

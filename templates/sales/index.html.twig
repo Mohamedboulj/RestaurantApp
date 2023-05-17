@@ -17,7 +17,7 @@
                             <div class="col-md">
                                 <button id="show-table" type="button" class="btn btn-outline-primary">View tables <i class="fa fa-eye" aria-hidden="true"></i></button>
                                 <div class="row my-3" id="table-details"></div>
-                                <div id="selected-table" class="row" ></div>
+                                <div id="selected-table" class="row my-3" ></div>
                             </div>
                             <div class="col-md">
                                 <nav>
@@ -80,6 +80,9 @@
             SELECTED_TABLE_ID = $(this).data("id");
             SELECTED_TABLE_NAME = $(this).data("name");
             $("#selected-table").html('<br><h4>Table: '+SELECTED_TABLE_NAME+'</h4><hr>');
+            $.get('/sales/getSaleDetailsByTable/'+SELECTED_TABLE_ID, function(data){
+                $("#order-detail").html(data);
+            })
             
         });
         // make the order details 
@@ -104,6 +107,22 @@
         });
         }
     });
+        $("#order-detail").on("click",".btn-confirm-order",function(){
+            var SALE_ID = $(this).data("id");
+            $.ajax({
+            type: "POST",
+            data: {
+            "_token" : $('meta[name="csrf-token"]').attr('content'),
+            "SALE_ID": SALE_ID,
+            },
+            url: "/sales/ConfirmOrder",
+            success: function(data){
+            $("#order-detail").html(data);
+            }
+        });
+
+        })
 })
 </script>
+
 {% endblock %}

@@ -23,23 +23,26 @@ class Sales
     #[ORM\Column(length: 255)]
     private ?string $user_name = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $total_price = null;
+    #[ORM\Column(type: Types::DECIMAL,options:["default" => 0], precision: 5, scale: 2,nullable: true)]
+    private ?string $total_price = "0";
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $total_received = null;
+    #[ORM\Column(type: Types::DECIMAL,options:["default" => 0], precision: 5, scale: 2,nullable: true)]
+    private ?string $total_received = "0";
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
-    private ?string $_change = null;
+    #[ORM\Column(type: Types::DECIMAL,options:["default" => 0], precision: 5, scale: 2,nullable: true)]
+    private ?string $_change = "0" ;
 
-    #[ORM\Column(length: 255)]
-    private ?string $payment_type = null;
+    #[ORM\Column(length: 255,options:["default" => " "],nullable: true)]
+    private ?string $payment_type = " ";
 
-    #[ORM\Column(length: 255)]
-    private ?string $sale_status = null;
+    #[ORM\Column(length: 255 , options:["default" => "unpaid"],nullable: true)]
+    private ?string $sale_status = "unpaid" ;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
+
+    #[ORM\Column]
+    private ?int $user_id = null;
 
     public function getId(): ?int
     {
@@ -150,6 +153,18 @@ class Sales
     public function setCreatedAt(\DateTimeInterface $created_at): self
     {
         $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getUserId(): ?int
+    {
+        return $this->user_id;
+    }
+
+    public function setUserId(int $user_id): self
+    {
+        $this->user_id = $user_id;
 
         return $this;
     }

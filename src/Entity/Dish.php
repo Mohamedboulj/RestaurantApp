@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DishRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: DishRepository::class)]
 class Dish
@@ -19,7 +20,7 @@ class Dish
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(type:Types::DECIMAL,options:["default" => 0], precision: 5, scale: 2 ,nullable: true)]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]

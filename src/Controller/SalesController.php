@@ -213,22 +213,23 @@ class SalesController extends AbstractController
     }
     #[Route('/DeleteOrder',name:'Deleteorder')]
     public function deleteSaleDetail(Request $request , EntityManagerInterface $em){
-        $saleDetail_id = $request->get('saleDetail_id');
+        $saleDetail_id = $request->get('SALE_ID');
         $saleDetail = $em->getRepository(SaleDetails::class)->find($saleDetail_id);
         $sale_id = $saleDetail->getSaleId();
-        $menu_price = ($saleDetail->menu_price * $saleDetail->quantity);
-        $saleDetail->delete();
+        $menu_price = $saleDetail->getMenuPrice() * $saleDetail->getQuantity();
+        $em->remove($saleDetail);
+        $em->flush() ;
         //update total price
-        $sale = Sale::find($sale_id);
-        $sale->total_price = $sale->total_price - $menu_price;
-        $sale->save();
-        // check if there any saledetail having the sale id 
-        $saleDetails = SaleDetail::where('sale_id', $sale_id)->first();
-        if($saleDetail){
-            $html = $this->getSaleDetails($sale_id);
+        $sale = $em->getRepository(Sales::class)->find($sale_id);
+        $sale->setTotalPrice($sale->getTotalPrice() - $menu_price) ;
+        $em->flush();
+        // check if there are any saledetail having the sale id 
+        $saleDetailId = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $sale_id ]) ;
+        if($saleDetailId){
+            $html = $this->getSaleDetails($saleDetailId , $em);
         }else{
             $html = "Not Found Any Sale Details for the Selected Table";
         }
-        return $html;
+        return new Response( $html );
     }
 }

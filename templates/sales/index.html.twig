@@ -122,6 +122,22 @@
         });
 
         })
+
+        $("#order-detail").on("click",".btn-delete-saledetail",function(){
+            var SALE_ID = $(this).data("id");
+            $.ajax({
+            type: "POST",
+            data: {
+            "_token" : $('meta[name="csrf-token"]').attr('content'),
+            "SALE_ID": SALE_ID,
+            },
+            url: "/sales/DeleteOrder",
+            success: function(data){
+            $("#order-detail").html(data);
+            }
+        });
+
+        })
 })
 </script>
 

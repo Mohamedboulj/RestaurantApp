@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\SaleDetails;
 use App\Entity\Sales;
+use App\Entity\Table;
 use App\Repository\CategoryRepository;
 use App\Repository\DishRepository;
 use App\Repository\SalesRepository;
@@ -176,7 +177,7 @@ class SalesController extends AbstractController
                     <td>'.($saleDetail->getMenuPrice() * $saleDetail->getQuantity()).'</td>';
                     if($saleDetail->getStatus() == "Not Confirmed"){
                         $showBtnPayment = false;
-                        $html .= '<td><a data-id="'.$saleDetail->getId().'" class="btn btn-danger btn-delete-saledetail"><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>';
+                        $html .= '<td><a data-id="'.$saleDetail->getId().'" class="btn btn-danger btn-delete-saledetail" ><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>';
                     }else{ // status == "confirm"
                         $html .= '<td><i class="fa fa-check-circle-o" aria-hidden="true"></i></td>';
                     }
@@ -189,7 +190,7 @@ class SalesController extends AbstractController
             $html .= '<h3>Total Amount: $'.number_format($sale->getTotalPrice(),2).'</h3>';
 
             if($showBtnPayment){
-                $html .= '<button data-id="'.$sale_id.'" data-totalAmount="'.$sale->getTotalPrice().'" class="btn btn-success btn-block btn-payment my-3 rounded-pill" data-toggle="modal" data-target="#exampleModal">Payment</button>';
+                $html .= '<button  data-id="'.$sale_id.'" data-totalAmount="'.$sale->getTotalPrice().'" class="btn btn-success btn-block btn-payment my-3 rounded-pill" data-toggle="modal" data-target="#paymentModal">Payment</button>';
             }else{
                 $html .= '<button data-id="'.$sale_id.'" class="btn btn-info btn-block btn-confirm-order">Confirm Order</button>';
             }
@@ -225,11 +226,36 @@ class SalesController extends AbstractController
         $em->flush();
         // check if there are any saledetail having the sale id 
         $saleDetailId = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $sale_id ]) ;
+        dump($saleDetailId);
         if($saleDetailId){
-            $html = $this->getSaleDetails($saleDetailId , $em);
+            $html = $this->getSaleDetails($sale_id , $em)->getContent();
         }else{
             $html = "Not Found Any Sale Details for the Selected Table";
         }
         return new Response( $html );
+    }
+
+    #[Route('/savePayment',name:'savepayment')]
+    public function savePayment(Request $req , EntityManagerInterface $em ,SalesRepository $srep){
+        
+        $saleId = $req->get('saleID');
+        dump($saleId);
+        $recievedAmount = $req->get('recievedAmount');
+        $paymentType = $req->get('paymentType');
+        $sale = $srep->find($saleId);
+        dump($sale);
+        if (!$sale) {
+            throw $this->createNotFoundException('Sale not found for id '.$saleId);
+        }
+        $sale->setPaymentType($paymentType);
+        $sale->setTotalReceived($recievedAmount);
+        $sale->setSaleStatus('paid');
+        $sale->setChange($sale->getTotalPrice() - $recievedAmount );
+        $tableId = $sale->getTableId() ;
+        $table= $em->getRepository(Table::class)->find($tableId);
+        $table->setStatus('Available');
+        $em->flush();
+        return $this->redirect($this->generateUrl('sales.index'));
+
     }
 }

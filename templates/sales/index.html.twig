@@ -44,6 +44,34 @@
         </div>
     </div>    
 </div>
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="exampleModalLabel">Payment</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h5 class="totalAmount" ></h5>
+        <input id="recieved-amount" type="text" class="form-control my-2" placeholder="recieved" >
+        <div class="form-group">
+          <label for="payment">Payment Type</label>
+          <select class="form-control" id="payment-type">
+            <option value="cash">Cash</option>
+            <option value="credit card">Credit Card</option>
+          </select>
+        </div>
+        <span class="changeAmount"></span>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-save-payment">Save payment</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
@@ -138,6 +166,53 @@
         });
 
         })
+        //payment modal
+
+        $("#order-detail").on("click",".btn-payment",function(){
+            var totalAmount = $(this).attr('data-totalAmount');
+            $(".totalAmount").html("Total Amount " + totalAmount);
+            $("#recieved-amount").val('');
+            $(".changeAmount").html('');
+            SALE_ID = $(this).data('id');
+
+        // calcuate change
+        $("#recieved-amount").keyup(function(){
+            var totalAmount = $(".btn-payment").attr('data-totalAmount');
+            var recievedAmount = $(this).val();
+            var changeAmount = recievedAmount - totalAmount;
+            $(".changeAmount").html("Total Change: $" + changeAmount);
+
+            //check if cashier enter the right amount, then enable or disable save payment button
+
+            if(changeAmount >= 0){
+            $('.btn-save-payment').prop('disabled', false);
+            }else{
+            $('.btn-save-payment').prop('disabled', true);
+            }
+
+        })
+})
+
+        // save payment
+        $(".btn-save-payment").click(function(){
+            var recievedAmount = $("#recieved-amount").val();
+            var paymentType =$("#payment-type").val();
+            var saleId = SALE_ID;
+            $.ajax({
+            type: "POST",
+            data: {
+                "_token" : $('meta[name="csrf-token"]').attr('content'),
+                "saleID" : saleId,
+                "recievedAmount" : recievedAmount,
+                "paymentType" : paymentType
+
+            },
+            url: "/sales/savePayment",
+            success: function(data){
+                window.location.href= data;
+            }
+            });
+        });
 })
 </script>
 

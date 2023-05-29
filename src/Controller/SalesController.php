@@ -255,7 +255,19 @@ class SalesController extends AbstractController
         $table= $em->getRepository(Table::class)->find($tableId);
         $table->setStatus('Available');
         $em->flush();
-        return $this->redirect($this->generateUrl('sales.index'));
+        return new Response('/sales/showReceipt/'.$saleId);
 
     }
+
+    #[Route('/showReceipt/{saleId}',name:'showReceipt')]
+    public function showReceipt($saleId , EntityManagerInterface $em)
+    {
+        $sale = $em->getRepository(Sales::class)->find($saleId);
+        $saleDetails = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $saleId]);
+        return $this->render('sales/showReceipt.html.twig', [
+            'sale' => $sale ,
+            'saleDetails' => $saleDetails
+        ]);
+    }
+
 }

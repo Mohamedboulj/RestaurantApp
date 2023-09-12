@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TableRepository::class)]
 #[ORM\Table(name: '`table`')]
-#[UniqueEntity(fields:'Number',message: 'This Table already exists .')]
+#[UniqueEntity(fields:'Number', message: 'This Table already exists .')]
 class Table
 {
     #[ORM\Id]

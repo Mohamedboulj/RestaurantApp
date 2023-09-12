@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello SalesController!{% endblock %}
 
 {% block body %}
 <div class="container">
@@ -94,6 +93,7 @@
             var id = $(this).data('id');
             {# alert(id); #}
             $.get('/sales/getMenu/'+id,function(data){
+                console.log("test");
                 $('#list-menu').hide();
                 $('#list-menu').html(data);
                 $('#list-menu').fadeIn('fast');

@@ -14,18 +14,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class OrderController extends AbstractController
 {
     #[Route('/order', name: 'orders')]
-    public function index(OrderRepository $order): Response
+    public function index(OrderRepository $sd): Response
     {
-        $order = $order->findBy(
-        ['ortable' => 'table1']
-        );
-
+        $order = $sd->findAll();
         return $this->render('order/index.html.twig', [
             'order' => $order,
         ]);
     }
     #[Route('/order/{id}', name: 'order')]
-    public function order(Dish $dish ,EntityManagerInterface $registry): Response
+    public function order(Dish $dish, EntityManagerInterface $registry): Response
     {
         $order = new Order();
         $order->setOrtable('table1');
@@ -34,31 +31,29 @@ class OrderController extends AbstractController
         $order->setPrice($dish->getPrice());
         $order->setStatus('Open');
 
-        $registry->persist($order); 
+        $registry->persist($order);
         $registry->flush();
         //message
-        $this ->addFlash('order',$order->getName().' was added to orders.') ; 
+        $this ->addFlash('order', $order->getName().' was added to orders.') ;
         return $this->redirect($this->generateUrl('menu'));
-        return $this->render('order/index.html.twig', [
-            'controller_name' => 'OrderController',
-        ]);
     }
-    #[Route('/status/{id},{status}',name:'status')]
-    public function status($id , $status, EntityManagerInterface $registry)
+
+    #[Route('/status/{id},{status}', name:'status')]
+    public function status($id, $status, EntityManagerInterface $registry)
     {
         $order = $registry->getRepository(Order::class)->find($id);
         $order->setStatus($status);
         $registry->flush();
         return $this->redirect($this->generateUrl('orders'));
-
     }
 
     #[Route('/delete/{id}', name: 'delete')]
-    function delete($id , OrderRepository $Ordrep ,EntityManagerInterface $registry){
-        $order =$Ordrep ->find($id);
-        $registry -> remove($order); 
+    public function delete($id, OrderRepository $Ordrep, EntityManagerInterface $registry)
+    {
+        $order = $Ordrep ->find($id);
+        $registry -> remove($order);
         $registry -> flush();
-        //message 
+        //message
         return $this->redirect($this->generateUrl('orders'));
     }
 }

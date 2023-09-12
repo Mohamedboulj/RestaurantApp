@@ -17,16 +17,15 @@ use Symfony\Component\Routing\Annotation\Route;
 class MailerController extends AbstractController
 {
     #[Route('/contact', name: 'contact')]
-    public function sendmail(MailerInterface $mailer , Request $request): Response
+    public function sendmail(MailerInterface $mailer, Request $request): Response
     {
         $formEmail = $this->createFormBuilder()
-        ->add('email',TextType::class)
-        ->add('message',TextareaType::class,['attr'=>array('rows'=>'5')])
-        ->add('Submit',SubmitType::class,['attr'=>array('class'=>'btn btn-outline-danger float-right','type'=>'button')])
+        ->add('email', TextType::class)
+        ->add('message', TextareaType::class, ['attr' => array('rows' => '5')])
+        ->add('Submit', SubmitType::class, ['attr' => array('class' => 'btn btn-outline-danger float-right','type' => 'button')])
         ->getForm();
         $formEmail->handleRequest($request);
-        if ($formEmail->isSubmitted()) 
-        {
+        if ($formEmail->isSubmitted()) {
             $input = $formEmail->getData();
             $sender = $input['email'] ;
             $text = $input['message'] ;
@@ -35,22 +34,20 @@ class MailerController extends AbstractController
             ->to('med.blj93@gmail.com')
             ->subject('order')
             ->htmlTemplate('mailer/mail.html.twig')
-            ->context(['message'=>$text]) ;
-        try 
-        {
-            $mailer -> send($email);
-            $this->addFlash('success','Message sent successfully.');
-            return $this->redirectToRoute('contact');
-        } catch (TransportExceptionInterface $e) 
-        {
-            $this->addFlash('error','Something went wrong , please try again, ('.$e->getMessage() .')');
-            return $this->redirectToRoute('contact');
-            
-        } 
+            ->context(['message' => $text]) ;
+            try {
+                $mailer -> send($email);
+                $this->addFlash('success', 'Message sent successfully.');
+                return $this->redirectToRoute('contact');
+            } catch (TransportExceptionInterface $e) {
+                $this->addFlash('error', 'Something went wrong , please try again, ('.$e->getMessage() .')');
+                return $this->redirectToRoute('contact');
+
+            }
         }
-        return $this->render('mailer/index.html.twig',[
-            'emailForm'=>$formEmail->createView()
+        return $this->render('mailer/index.html.twig', [
+            'emailForm' => $formEmail->createView()
         ]);
-        
+
     }
 }

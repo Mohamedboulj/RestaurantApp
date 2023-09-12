@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% block style %}
+<link rel="stylesheet" href="{{ asset('css/receipt.css')  }}"/>
+{% endblock %}
+{% block body %}
+<script>
+		function printDiv(divName){
+			var printContents = document.getElementById(divName).innerHTML;
+			var originalContents = document.body.innerHTML;
+
+			document.body.innerHTML = printContents;
+
+			window.print();
+
+			document.body.innerHTML = originalContents;
+		}
+</script
+<div class="container">
+<div id="wrapper">
+<div id="print">
+    <div id="receipt-header">
+      <h3 id="resturant-name" class="my-2">Savior Bistro Resturant</h3>
+      <p>Address: 435 Shoreline Village Drive, Long Beach</p>
+      <p>CA 90802, United States</p>
+      <p>Tel: +1 562-432-6500</p>
+      <p>Reference Receipt: <strong>{{sale.id}}</strong></p>
+    </div>
+    <div id="receipt-body">
+      <table class="tb-sale-detail">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Menu</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          {% for sd in saleDetails %}
+            <tr>
+              <td width="30">{{sd.getId()}}</td>
+              <td width="180">{{sd.getMenuName()}}</td>
+              <td width="50">{{sd.getQuantity()}}</td>
+              <td width="55">{{sd.getMenuPrice()}}</td>
+              <td width="65">{{sd.getMenuPrice() * sd.getQuantity()}}</td>
+            </tr>
+          {% endfor %} 
+            
+        </tbody>
+      </table>
+      <table class="tb-sale-total">
+        <tbody>
+          <tr>
+            <td>Total Quantity</td>
+            <td>{{saleDetails|length}}</td>
+            <td>Total</td>
+            <td>{{sale.getTotalPrice()|number_format(2, ',', '.')}}</td>
+          </tr>
+          <tr>
+            <td colspan="2">Payment Type</td>
+            <td colspan="2">{{sale.getPaymentType()}}</td>
+          </tr>
+          <tr>
+            <td colspan="2">Paid Amount</td>
+            <td colspan="2">{{sale.getTotalReceived()|number_format(2, ',', '.')}}</td>
+          </tr>
+          <tr>
+            <td colspan="2">Change</td>
+            <td colspan="2">{{sale.getChange()|number_format(2, ',', '.')}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="receipt-footer">
+      <p>Thanks for your visite </p>
+       {{sale.getCreatedAt()|date("F jS \\a\\t g:ia")}}
+      
+    </div>
+    </div>
+    <div id="buttons">
+      <a href="/sales">
+        <button class="btn btn-back">
+          Back to Cashier
+        </button>
+      </a>
+      <button class="btn btn-print" type="button" onclick="printDiv('print'); return false;">
+        Print
+      </button>
+    </div>
+  </div>
+</div>
+
+{%  endblock %}

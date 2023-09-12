@@ -13,8 +13,8 @@ class HomeController extends AbstractController
     public function index(DishRepository $dish): Response
     {
         $dish = $dish->findAll();
-        $rand_dish = array_rand($dish,2) ;
-        
+        $rand_dish = array_rand($dish, 2) ;
+
         return $this->render('home/index.html.twig', [
             'dish1' => $dish[$rand_dish[0]],
             'dish2' => $dish[$rand_dish[1]]

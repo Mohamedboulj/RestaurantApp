@@ -30,54 +30,56 @@ class SalesController extends AbstractController
         ]);
     }
     #[Route('/getTables', name: 'tables')]
-    public function alltables(TableRepository $tableRepository): Response{
+    public function alltables(TableRepository $tableRepository): Response
+    {
         $package = new Package(new EmptyVersionStrategy());
         $pic = $package->getUrl('/pictures/table.png') ;
         $tables = $tableRepository->findAll() ;
         $html = " " ;
         foreach ($tables as $table) {
             $html .= '<div class="col-md-3 mb-4">';
-            $html .= 
+            $html .=
             '<button class="btn btn-light btn-table " data-id="'.$table->getId().'" data-name="Table N°'.$table->getNumber().'">
             
             <img class="img-fluid" src="'.$pic.'"/>
             <br>';
-            if($table->getStatus() == "Available"){
+            if($table->getStatus() == "Available") {
                 $html .= '<span class="badge badge-success">Table N° '.$table->getNumber().'</span>';
-            }else{ // a table is not available
+            } else { // a table is not available
                 $html .= '<span class="badge badge-danger">Table N° '.$table->getNumber().'</span>';
             }
-            $html .='</button>';
+            $html .= '</button>';
             $html .= '</div>';
         }
         return new Response($html) ;
     }
 
     #[Route('/getMenu/{id}', name: 'getmenu')]
-    public function getmenu($id , DishRepository $dishRep): Response{
+    public function getmenu($id, DishRepository $dishRep): Response
+    {
         $package = new Package(new EmptyVersionStrategy());
-        
+
         $menus = $dishRep->findByCategory($id) ;
         $html = "" ;
-        foreach($menus as $menu){
+        foreach ($menus as $menu) {
             $pic = $package->getUrl('/pictures/'.$menu->getPicture()) ;
-            $html .= 
+            $html .=
             '<div class="col-md-3 text-center">
                 <a class="btn btn-outline-light btn-menu curs-ptr" data-name="'.$menu->getName().'" data-id="'.$menu->getId().'">
                     <img class="img-fluid" src="'.$pic.'">
                     <br>
                     '.$menu->getName().'
                     <br>
-                    $'.number_format($menu->getPrice(),2).'
+                    $'.number_format($menu->getPrice(), 2).'
                 </a>
             </div>';
         }
-        
+
         return new Response($html) ;
 
     }
     #[Route('/orderFood', name: 'orderFood')]
-    public function orderFood(Request $req ,EntityManagerInterface $em,DishRepository $dishRepository ,TableRepository $tableRep , Security $security): Response
+    public function orderFood(Request $req, EntityManagerInterface $em, DishRepository $dishRepository, TableRepository $tableRep, Security $security): Response
     {
         $menu_id = $req->get('menu_id') ;
         $menu = $dishRepository->find($menu_id) ;
@@ -85,10 +87,10 @@ class SalesController extends AbstractController
         $table_name = $req->get('table_name');
         $saleRep = $em->getRepository(Sales::class);
         $sale = $saleRep->findOneBy(['table_id' => $table_id,'sale_status' => 'unpaid']);
-        
-        if (!$sale){
+
+        if (!$sale) {
             $user = $security->getUser();
-            $user_id =$user->getId() ;
+            $user_id = $user->getId() ;
             $sale = new Sales();
             $sale->setTableId($table_id);
             $sale->setTableName($table_name);
@@ -102,57 +104,55 @@ class SalesController extends AbstractController
             $table->setStatus('Not available');
             $em -> persist($table);
             $em -> flush();
-            
-        }
-        else
-        {
+        } else {
             $sale_id = $sale->getId();
-            
         }
         // add ordered menu to the sale_details table
 
-            $saleDetail = new SaleDetails(); 
-            $saleDetail->setSaleId($sale_id);
-            $saleDetail->setMenuId($menu_id);
-            $saleDetail->setMenuName($menu->getName());
-            $saleDetail->setMenuPrice($menu->getPrice());
-            $saleDetail->setQuantity($req->get('quantity'));
-            $saleDetail->setCreatedAt(new \DateTime()) ;
-            $saleDetail->setEditedAt(new \DateTimeImmutable());
-            $em -> persist($saleDetail);
-            $em -> flush();
+        $saleDetail = new SaleDetails();
+        $saleDetail->setSaleId($sale_id);
+        $saleDetail->setMenuId($menu_id);
+        $saleDetail->setMenuName($menu->getName());
+        $saleDetail->setMenuPrice($menu->getPrice());
+        $saleDetail->setQuantity($req->get('quantity'));
+        $saleDetail->setCreatedAt(new \DateTime()) ;
+        $saleDetail->setEditedAt(new \DateTimeImmutable());
+        $em -> persist($saleDetail);
+        $em -> flush();
         //update total price in the sales table
-            $tp = $sale->getTotalPrice() + $req->get('quantity') * $menu->getPrice() ;
-            $sale->setTotalPrice($tp);
-            $em -> persist($sale);
-            $em -> flush();
+        $tp = $sale->getTotalPrice() + $req->get('quantity') * $menu->getPrice() ;
+        $sale->setTotalPrice($tp);
+        $em -> persist($sale);
+        $em -> flush();
         //return html to view
-            $html = $this->getSaleDetails($sale_id , $em)->getContent() ;
-            return new Response( $html ) ;
-            
-        
+        $html = $this->getSaleDetails($sale_id, $em)->getContent() ;
+        return new Response($html) ;
+
+
     }
     #[Route('/getSaleDetailsByTable/{table_id}', name:'SaleDetailsByTable')]
-    public function getSaleDetailsByTable($table_id , EntityManagerInterface $em ){
+    public function getSaleDetailsByTable($table_id, EntityManagerInterface $em)
+    {
         $saleRep = $em->getRepository(Sales::class);
         $sale = $saleRep->findOneBy(['table_id' => $table_id,'sale_status' => 'unpaid']);
         $html = "" ;
-        if($sale){
+        if($sale) {
             $sale_id = $sale->getId();
             $html .= $this->getSaleDetails($sale_id, $em)->getContent() ;
-        }else{
+        } else {
             $html .= "<h5> No sales found on the selected table </h5>  " ;
         }
 
-        return new Response( $html ) ;
+        return new Response($html) ;
     }
 
-    private function getSaleDetails($sale_id,EntityManagerInterface $em ){
+    private function getSaleDetails($sale_id, EntityManagerInterface $em)
+    {
         //list all sale details
         $saleRep = $em->getRepository(Sales::class);
         $saleDetails = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $sale_id]);
         $html = "" ;
-            $html .= '<div class="table-responsive-md" style="overflow-y:scroll; height: 400px; border: 1px solid #343A40">
+        $html .= '<div class="table-responsive-md" style="overflow-y:scroll; height: 400px; border: 1px solid #343A40">
             <table class="table table-primary ">
             <thead>
                 <tr>
@@ -165,55 +165,57 @@ class SalesController extends AbstractController
                 </tr>
             </thead>
             <tbody>';
-            $showBtnPayment = true;
-            foreach($saleDetails as $saleDetail){
-            
-                $html .= '
+        $showBtnPayment = true;
+        foreach($saleDetails as $saleDetail) {
+
+            $html .= '
                 <tr>
                     <td>'.$saleDetail->getMenuId().'</td>
                     <td>'.$saleDetail->getMenuName().'</td>
                     <td>'.$saleDetail->getQuantity().'</td>
                     <td>'.$saleDetail->getMenuPrice().'</td>
                     <td>'.($saleDetail->getMenuPrice() * $saleDetail->getQuantity()).'</td>';
-                    if($saleDetail->getStatus() == "Not Confirmed"){
-                        $showBtnPayment = false;
-                        $html .= '<td><a data-id="'.$saleDetail->getId().'" class="btn btn-danger btn-delete-saledetail" ><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>';
-                    }else{ // status == "confirm"
-                        $html .= '<td><i class="fa fa-check-circle-o" aria-hidden="true"></i></td>';
-                    }
-                $html .= '</tr>';
+            if($saleDetail->getStatus() == "Not Confirmed") {
+                $showBtnPayment = false;
+                $html .= '<td><a data-id="'.$saleDetail->getId().'" class="btn btn-danger btn-delete-saledetail" ><i class="fa fa-trash-o" aria-hidden="true"></i></a></td>';
+            } else { // status == "confirm"
+                $html .= '<td><i class="fa fa-check-circle-o" aria-hidden="true"></i></td>';
             }
-            $html .='</tbody></table></div>';
+            $html .= '</tr>';
+        }
+        $html .= '</tbody></table></div>';
 
-            $sale = $saleRep->find($sale_id);
-            $html .= '<hr>';
-            $html .= '<h3>Total Amount: $'.number_format($sale->getTotalPrice(),2).'</h3>';
+        $sale = $saleRep->find($sale_id);
+        $html .= '<hr>';
+        $html .= '<h3>Total Amount: $'.number_format($sale->getTotalPrice(), 2).'</h3>';
 
-            if($showBtnPayment){
-                $html .= '<button  data-id="'.$sale_id.'" data-totalAmount="'.$sale->getTotalPrice().'" class="btn btn-success btn-block btn-payment my-3 rounded-pill" data-toggle="modal" data-target="#paymentModal">Payment</button>';
-            }else{
-                $html .= '<button data-id="'.$sale_id.'" class="btn btn-info btn-block btn-confirm-order">Confirm Order</button>';
-            }
+        if($showBtnPayment) {
+            $html .= '<button  data-id="'.$sale_id.'" data-totalAmount="'.$sale->getTotalPrice().'" class="btn btn-success btn-block btn-payment my-3 rounded-pill" data-toggle="modal" data-target="#paymentModal">Payment</button>';
+        } else {
+            $html .= '<button data-id="'.$sale_id.'" class="btn btn-info btn-block btn-confirm-order">Confirm Order</button>';
+        }
 
-            return new Response($html) ;
+        return new Response($html) ;
     }
-    #[Route('/ConfirmOrder',name:'confirmorder')]
-    public function confirmOrder(Request $req , EntityManagerInterface $em){
-        
+    #[Route('/ConfirmOrder', name:'confirmorder')]
+    public function confirmOrder(Request $req, EntityManagerInterface $em)
+    {
+
         $sale_id = $req->get('SALE_ID');
         $saleRep = $em->getRepository(SaleDetails::class);
-        $sale = $saleRep->findBy(['sale_id' => $sale_id , 'status'=>'Not Confirmed']);
+        $sale = $saleRep->findBy(['sale_id' => $sale_id , 'status' => 'Not Confirmed']);
         foreach ($sale as $s) {
             $s->setStatus('Confirmed');
             $em ->persist($s) ;
             $em ->flush();
         }
-        $html = $this->getSaleDetails($sale_id , $em)->getContent() ;
-        return new Response( $html ) ;
+        $html = $this->getSaleDetails($sale_id, $em)->getContent() ;
+        return new Response($html) ;
 
     }
-    #[Route('/DeleteOrder',name:'Deleteorder')]
-    public function deleteSaleDetail(Request $request , EntityManagerInterface $em){
+    #[Route('/DeleteOrder', name:'Deleteorder')]
+    public function deleteSaleDetail(Request $request, EntityManagerInterface $em)
+    {
         $saleDetail_id = $request->get('SALE_ID');
         $saleDetail = $em->getRepository(SaleDetails::class)->find($saleDetail_id);
         $sale_id = $saleDetail->getSaleId();
@@ -224,20 +226,21 @@ class SalesController extends AbstractController
         $sale = $em->getRepository(Sales::class)->find($sale_id);
         $sale->setTotalPrice($sale->getTotalPrice() - $menu_price) ;
         $em->flush();
-        // check if there are any saledetail having the sale id 
+        // check if there are any saledetail having the sale id
         $saleDetailId = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $sale_id ]) ;
         dump($saleDetailId);
-        if($saleDetailId){
-            $html = $this->getSaleDetails($sale_id , $em)->getContent();
-        }else{
+        if($saleDetailId) {
+            $html = $this->getSaleDetails($sale_id, $em)->getContent();
+        } else {
             $html = "Not Found Any Sale Details for the Selected Table";
         }
-        return new Response( $html );
+        return new Response($html);
     }
 
-    #[Route('/savePayment',name:'savepayment')]
-    public function savePayment(Request $req , EntityManagerInterface $em ,SalesRepository $srep){
-        
+    #[Route('/savePayment', name:'savepayment')]
+    public function savePayment(Request $req, EntityManagerInterface $em, SalesRepository $srep)
+    {
+
         $saleId = $req->get('saleID');
         dump($saleId);
         $recievedAmount = $req->get('recievedAmount');
@@ -250,12 +253,24 @@ class SalesController extends AbstractController
         $sale->setPaymentType($paymentType);
         $sale->setTotalReceived($recievedAmount);
         $sale->setSaleStatus('paid');
-        $sale->setChange($sale->getTotalPrice() - $recievedAmount );
+        $sale->setChange($sale->getTotalPrice() - $recievedAmount);
         $tableId = $sale->getTableId() ;
-        $table= $em->getRepository(Table::class)->find($tableId);
+        $table = $em->getRepository(Table::class)->find($tableId);
         $table->setStatus('Available');
         $em->flush();
-        return $this->redirect($this->generateUrl('sales.index'));
+        return new Response('/sales/showReceipt/'.$saleId);
 
     }
+
+    #[Route('/showReceipt/{saleId}', name:'showReceipt')]
+    public function showReceipt($saleId, EntityManagerInterface $em)
+    {
+        $sale = $em->getRepository(Sales::class)->find($saleId);
+        $saleDetails = $em->getRepository(SaleDetails::class)->findBy(['sale_id' => $saleId]);
+        return $this->render('sales/showReceipt.html.twig', [
+            'sale' => $sale ,
+            'saleDetails' => $saleDetails
+        ]);
+    }
+
 }

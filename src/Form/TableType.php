@@ -15,8 +15,8 @@ class TableType extends AbstractType
     {
         $builder
             ->add('Number')
-            ->add('Status',ChoiceType::class,['choices'=>['Available'=>'Available','Not Available'=>'Not Available'],'attr'=>['class' => 'form-control']])
-            ->add('Create',SubmitType::class,['attr'=>array('class'=>'btn btn-outline-danger float-right')])
+            ->add('Status', ChoiceType::class, ['choices' => ['Available' => 'Available','Not Available' => 'Not Available'],'attr' => ['class' => 'form-control']])
+            ->add('Create', SubmitType::class, ['attr' => array('class' => 'btn btn-outline-danger float-right')])
         ;
     }
 

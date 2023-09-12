@@ -20,30 +20,30 @@ use Symfony\Component\Routing\Annotation\Route;
 class RegisterController extends AbstractController
 {
     #[Route('/register', name: 'register')]
-    public function register(Request $request ,UserPasswordHasherInterface $passwordhasher, EntityManagerInterface $registry , UserRepository $usersRepository): Response
+    public function register(Request $request, UserPasswordHasherInterface $passwordhasher, EntityManagerInterface $registry, UserRepository $usersRepository): Response
     {
         $regform = $this->createFormBuilder()
-        ->add('username',TextType::class,['label'=>'Employee'])
-        ->add('password',RepeatedType::class,[
-            'type'=> PasswordType::class,
-            'required'=>true,
-            'first_options'=>['label'=>'Password'],
-            'second_options'=>['label'=>'Repeat password']
+        ->add('username', TextType::class, ['label' => 'Employee'])
+        ->add('password', RepeatedType::class, [
+            'type' => PasswordType::class,
+            'required' => true,
+            'first_options' => ['label' => 'Password'],
+            'second_options' => ['label' => 'Repeat password']
         ])
-        ->add('Role',ChoiceType::class,['choices'=>['ROLE_WAITER'=>'ROLE_WAITER','ROLE_ADMIN'=>'ROLE_ADMIN'],'attr'=>['class' => 'form-control'],'required'=>true])
-        ->add('Save',SubmitType::class,['attr'=>array('class'=>'btn btn-outline-primary float-right')])
+        ->add('Role', ChoiceType::class, ['choices' => ['ROLE_WAITER' => 'ROLE_WAITER','ROLE_ADMIN' => 'ROLE_ADMIN'],'attr' => ['class' => 'form-control'],'required' => true])
+        ->add('Save', SubmitType::class, ['attr' => array('class' => 'btn btn-outline-primary float-right')])
         ->getForm()
         ;
         $regform->handleRequest($request);
-        if($regform->isSubmitted()){
+        if($regform->isSubmitted()) {
             $input = $regform->getData();
             $user = new User();
             $user->setUsername($input['username']);
             $user->setPassword(
                 $passwordhasher
-                ->hashPassword($user,$input['password'])
-                );
-            $role_arr = explode(',',$input['Role']);
+                ->hashPassword($user, $input['password'])
+            );
+            $role_arr = explode(',', $input['Role']);
             $user->setRoles($role_arr);
             $registry->persist($user);
             $registry->flush();
@@ -51,17 +51,17 @@ class RegisterController extends AbstractController
         }
         $users = $usersRepository->findAll();
         return $this->render('register/index.html.twig', [
-            'regform'=> $regform->createView(),
+            'regform' => $regform->createView(),
             'users' => $users ,
         ]);
     }
-    #[Route("/delete_user/{id}",name:"delete_user")]
-    public function delete_user($id,UserRepository $usersRepository,EntityManagerInterface $em)
+    #[Route("/delete_user/{id}", name:"delete_user")]
+    public function delete_user($id, UserRepository $usersRepository, EntityManagerInterface $em)
     {
         $user = $usersRepository->find($id);
         $em->remove($user);
         $em->flush();
-        $this->addFlash('success','Waiter has been deleted with success');
+        $this->addFlash('success', 'Waiter has been deleted with success');
         return $this->redirect($this->generateUrl('register'));
 
     }

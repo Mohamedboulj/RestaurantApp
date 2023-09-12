@@ -24,35 +24,35 @@ class TablesController extends AbstractController
     }
 
     #[Route('/create', name: 'create')]
-    public function create(Request $request , EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em): Response
     {
-        $table = new Table ;
+        $table = new Table() ;
         $form = $this->createForm(TableType::class, $table) ;
         $form->handleRequest($request) ;
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($table) ;
             $em->flush() ;
-            $this->addFlash('success','Table created with success !') ;
+            $this->addFlash('success', 'Table created with success !') ;
             return $this->redirect($this->generateUrl('tables.create'));
         }
         return $this->render('tables/create.html.twig', [
-            'createForm'=> $form->createView()
+            'createForm' => $form->createView()
         ]);
     }
-    #[Route('/delete/{id}',name:'delete')]
-    public function delete($id , TableRepository $tableRep, EntityManagerInterface $em)
+    #[Route('/delete/{id}', name:'delete')]
+    public function delete($id, TableRepository $tableRep, EntityManagerInterface $em)
     {
         $table = $tableRep->find($id);
         dump($table);
         $em->remove($table);
         $em->flush();
-        $this->addFlash('success','Table number '.$table->getNumber().' is deleted with success !') ;
+        $this->addFlash('success', 'Table number '.$table->getNumber().' is deleted with success !') ;
         return $this->redirect($this->generateUrl('tables.show'));
 
-        
+
     }
-    #[Route('/update/{id},{status}',name:'update')]
-    public function update(TableRepository $tableRep, EntityManagerInterface $em ,$status, $id)
+    #[Route('/update/{id},{status}', name:'update')]
+    public function update(TableRepository $tableRep, EntityManagerInterface $em, $status, $id)
     {
         $table = $tableRep->find($id);
         $table->setStatus($status);

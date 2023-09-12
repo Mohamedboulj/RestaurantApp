@@ -69,6 +69,7 @@
 					<li><a href="{{ path('dish.edit') }}">Dishes</a></li>
 					<li><a href="{{ path('orders') }}">Orders</a></li>
 					<li><a href="{{ path('tables.show') }}">Tables</a></li>
+					<li><a href="{{ path('sales.index') }}">Sales</a></li>
 					{% if is_granted('ROLE_ADMIN') %}
 					<li><a href="{{ path('register') }}" class="register">Waiters</a></li>
 					{% endif %}

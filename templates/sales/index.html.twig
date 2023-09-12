@@ -93,6 +93,7 @@
             var id = $(this).data('id');
             {# alert(id); #}
             $.get('/sales/getMenu/'+id,function(data){
+                console.log("test");
                 $('#list-menu').hide();
                 $('#list-menu').html(data);
                 $('#list-menu').fadeIn('fast');

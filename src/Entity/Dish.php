@@ -20,7 +20,7 @@ class Dish
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(type:Types::DECIMAL,options:["default" => 0], precision: 5, scale: 2 ,nullable: true)]
+    #[ORM\Column(type:Types::DECIMAL, options:["default" => 0], precision: 5, scale: 2, nullable: true)]
     private ?float $price = null;
 
     #[ORM\Column(length: 255)]
@@ -29,13 +29,13 @@ class Dish
     #[ORM\ManyToOne(inversedBy: 'dishes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Category $category = null;
-    
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    
+
 
     public function getName(): ?string
     {
